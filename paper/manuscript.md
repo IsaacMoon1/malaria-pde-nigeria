@@ -244,7 +244,7 @@ This study advances spatial disease modeling by combining formal numerical verif
 ## 12. Data and Code Availability
 
 The computational pipeline, including downloaders, verification suites, MCMC calibration, validation scripts, and figure/table generators, is open-source under the MIT License at:  
-`https://github.com/computational-epidemiology-nigeria/malaria-pde-pipeline` (local repository: `C:\Users\HP\.gemini\antigravity\scratch\malaria_pde_nigeria`).
+`https://github.com/computational-epidemiology-nigeria/malaria-pde-pipeline` (local repository: `https://github.com/IsaacMoon1/malaria-pde-nigeria`).
 
 The complete workflow executes via a single command:
 ```bash

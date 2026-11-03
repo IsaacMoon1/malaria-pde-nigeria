@@ -75,7 +75,7 @@ malaria_pde_nigeria/
 ### Setup Virtual Environment
 ```bash
 # Clone or enter the workspace
-cd C:\Users\HP\.gemini\antigravity\scratch\malaria_pde_nigeria
+cd https://github.com/IsaacMoon1/malaria-pde-nigeria
 
 # Create and activate a clean virtual environment
 python -m venv venv
