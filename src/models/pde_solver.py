@@ -103,8 +103,9 @@ class MalariaPDESolver:
         else:
             K_t = K0 * (rainfall / (rainfall + scale + 1e-6))
             
-        # Breeding water bodies located near x = 0
-        return np.maximum(50.0, K_t * (1.2 - 0.8 * (self.x / self.L)))
+        # Aquatic breeding capacity concentrated in wetland zone (x <= 1.5 km)
+        spatial_profile = np.where(self.x <= 1.5, 1.0, 0.05)
+        return np.maximum(20.0, K_t * spatial_profile)
 
     def rhs(self, t, y, climate_interpolator, interventions, carrying_capacity_form="standard"):
         """
@@ -142,7 +143,8 @@ class MalariaPDESolver:
         # Query climate at time t
         temp_t, rain_t = climate_interpolator(t)
         rates = temperature_dependent_rates(temp_t)
-        a_T = rates["a_T"]
+        a_scale = self.p.get("a_biting_rate", 0.33) / 0.33
+        a_T = rates["a_T"] * a_scale
         nu_M = rates["nu_M"]
         mu_M = rates["mu_M"]
         gamma_L = rates["gamma_L"]
@@ -168,7 +170,7 @@ class MalariaPDESolver:
         # 1. Aquatic Stage ODE: dL/dt
         # Oviposition by adult females M_A = M_S + M_E + M_I
         M_A = M_S + M_E + M_I
-        dL_dt = self.p["beta_E"] * M_A * np.maximum(0.0, 1.0 - L_aq / K_cap) - (d_L + gamma_L + larvicide_mort) * L_aq
+        dL_dt = self.p["beta_E"] * M_A * (K_cap / (K_cap + L_aq + 1e-6)) - (d_L + gamma_L + larvicide_mort) * L_aq
         
         # 2. Diffusion Laplacians for adult mosquitoes with homogeneous Neumann BCs
         # at i=0: (2*M[1] - 2*M[0]) / dx^2
@@ -214,11 +216,13 @@ class MalariaPDESolver:
         omega_H = self.p["omega_H"]
         psi_SMC = self.p["psi_SMC"]
         
+        eta_clear = 0.95
+        # S_H and E_H and cleared I_H move to P_H; R_H retains natural acquired immunity
         dSH_dt = mu_H * N_H_tot + omega_H * R_H + psi_SMC * P_H - lambda_H * S_H - mu_H * S_H - smc_rate * S_H
-        dEH_dt = lambda_H * S_H - (alpha_H + mu_H) * E_H
-        dIH_dt = alpha_H * E_H - (gamma_H + mu_H) * I_H
+        dEH_dt = lambda_H * S_H - (alpha_H + mu_H) * E_H - smc_rate * E_H
+        dIH_dt = alpha_H * E_H - (gamma_H + mu_H) * I_H - smc_rate * eta_clear * I_H
         dRH_dt = gamma_H * I_H - (omega_H + mu_H) * R_H
-        dPH_dt = smc_rate * S_H - (psi_SMC + mu_H) * P_H
+        dPH_dt = smc_rate * (S_H + E_H + eta_clear * I_H) - (psi_SMC + mu_H) * P_H
         
         dydt = np.concatenate([dL_dt, dMS_dt, dME_dt, dMI_dt, dSH_dt, dEH_dt, dIH_dt, dRH_dt, dPH_dt])
         return dydt

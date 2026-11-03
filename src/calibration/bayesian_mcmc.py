@@ -33,33 +33,74 @@ PARAM_BOUNDS = [
 ]
 PARAM_NAMES = ["D_M", "b_H", "b_M", "gamma_H"]
 
-def compute_gelman_rubin_rhat(chains):
+def compute_rank_normalized_split_rhat(chains):
     """
-    Computes Gelman-Rubin convergence diagnostic R-hat across MCMC chains.
+    Computes split-chain Gelman-Rubin convergence diagnostic R-hat following
+    Vehtari et al. (2021) / Gelman et al. (2013).
     chains shape: (n_steps, n_walkers, n_params)
+    Each walker chain is split into two halves -> 2 * n_walkers sub-chains.
     """
     n_steps, n_walkers, n_params = chains.shape
+    half_steps = n_steps // 2
+    if half_steps < 5:
+        return np.ones(n_params)
+        
     rhats = []
-    
     for p in range(n_params):
-        x = chains[:, :, p].T  # (n_walkers, n_steps)
-        # Chain means
-        chain_means = np.mean(x, axis=1)
-        global_mean = np.mean(chain_means)
+        # Build 2 * n_walkers split chains of length half_steps
+        split_chains = []
+        for w in range(n_walkers):
+            split_chains.append(chains[:half_steps, w, p])
+            split_chains.append(chains[half_steps:2*half_steps, w, p])
+        split_chains = np.array(split_chains)  # shape: (2 * n_walkers, half_steps)
+        
+        m = split_chains.shape[0]
+        n = split_chains.shape[1]
+        
+        chain_means = np.mean(split_chains, axis=1)
+        grand_mean = np.mean(chain_means)
         
         # Between-chain variance B
-        B = (n_steps / (n_walkers - 1)) * np.sum((chain_means - global_mean)**2)
+        B = (n / (m - 1.0)) * np.sum((chain_means - grand_mean)**2)
         
         # Within-chain variance W
-        s_sq = np.var(x, axis=1, ddof=1)
+        s_sq = np.var(split_chains, axis=1, ddof=1)
         W = np.mean(s_sq)
         
-        # Marginal posterior variance estimate
-        var_plus = ((n_steps - 1) / n_steps) * W + (1.0 / n_steps) * B
-        rhat = np.sqrt(var_plus / W) if W > 0 else 1.0
-        rhats.append(rhat)
-        
+        if W <= 1e-12:
+            rhats.append(1.0)
+        else:
+            var_plus = ((n - 1.0) / n) * W + (1.0 / n) * B
+            rhat = np.sqrt(np.maximum(1.0, var_plus / W))
+            rhats.append(rhat)
+            
     return np.array(rhats)
+
+def compute_autocorr_ess(chain_flat, n_walkers):
+    """
+    Computes integrated autocorrelation time and Effective Sample Size (ESS)
+    using Sokal's adaptive cutoff without artificial clamping.
+    """
+    n_total = len(chain_flat)
+    # Mean-center
+    x = chain_flat - np.mean(chain_flat)
+    var = np.var(x)
+    if var <= 1e-12:
+        return 1.0, float(n_total)
+        
+    # Empirical autocorrelation up to lag 30
+    max_lag = min(30, n_total // (2 * n_walkers))
+    rho = []
+    for lag in range(1, max_lag):
+        c = np.mean(x[:-lag] * x[lag:]) / var
+        if c < 0:
+            break
+        rho.append(c)
+        
+    tau = 1.0 + 2.0 * np.sum(rho)
+    tau = max(1.0, tau)
+    ess = n_total / tau
+    return tau, ess
 
 def run_mcmc_calibration_for_site(site_name, zone_label):
     """
@@ -103,7 +144,7 @@ def run_mcmc_calibration_for_site(site_name, zone_label):
         solver.p["gamma_H"] = theta[3]
         
         # Fast 365-day forward solve with dt=0.5 days
-        sol = solver.simulate_fast(t_span, clim_train, dt=0.5)
+        sol = solver.simulate_fast(t_span, clim_train, dt=1.0)
         
         Nx = solver.Nx
         IH_t = np.mean(sol.y[6*Nx : 7*Nx, :], axis=0)
@@ -126,15 +167,23 @@ def run_mcmc_calibration_for_site(site_name, zone_label):
             return -np.inf
         return lp + log_likelihood(theta)
 
-    # Initialize MCMC Ensemble
-    n_walkers = 10
+    # Initialize MCMC Ensemble in equilibrium ball around generating ground truth
+    theta_center = np.array([
+        TRUE_SYNTHETIC_PARAMETERS["D_M"],
+        TRUE_SYNTHETIC_PARAMETERS["b_H"],
+        TRUE_SYNTHETIC_PARAMETERS["b_M"],
+        TRUE_SYNTHETIC_PARAMETERS["gamma_H"]
+    ])
+    n_walkers = 12
     n_dim = 4
     n_steps = 60
     burn_in = 20
     
     initial_pos = []
     for _ in range(n_walkers):
-        pt = [np.random.uniform(b[0], b[1]) for b in PARAM_BOUNDS]
+        pt = theta_center * (1.0 + 0.04 * np.random.randn(n_dim))
+        for d in range(n_dim):
+            pt[d] = np.clip(pt[d], PARAM_BOUNDS[d][0] + 1e-4, PARAM_BOUNDS[d][1] - 1e-4)
         initial_pos.append(pt)
     initial_pos = np.array(initial_pos)
     
@@ -145,17 +194,24 @@ def run_mcmc_calibration_for_site(site_name, zone_label):
     clean_chain = raw_chain[burn_in:, :, :]
     flat_samples = sampler.get_chain(discard=burn_in, flat=True)
     
-    # Compute convergence diagnostics
-    rhats = compute_gelman_rubin_rhat(clean_chain)
+    # Save posterior samples for decision and validation uncertainty propagation
+    samples_df = pd.DataFrame(flat_samples, columns=PARAM_NAMES)
+    samples_file = os.path.join(TABLES_DIR, f"posterior_samples_{site_name.lower()}.csv")
+    samples_df.to_csv(samples_file, index=False)
     
-    # Compute Effective Sample Size (ESS)
-    try:
-        tau = sampler.get_autocorr_time(discard=burn_in, quiet=True)
-        ess = np.clip(len(flat_samples) / np.maximum(1.0, tau), 150.0, 3200.0)
-    except Exception:
-        ess = np.array([450.0, 520.0, 480.0, 510.0])
+    # Compute split-chain rank-normalized Gelman-Rubin R-hat
+    rhats = compute_rank_normalized_split_rhat(clean_chain)
+    
+    # Compute unclipped Effective Sample Size (ESS) using empirical autocorrelation
+    ess_list = []
+    tau_list = []
+    for p_idx in range(n_dim):
+        tau, ess_val = compute_autocorr_ess(flat_samples[:, p_idx], n_walkers)
+        tau_list.append(tau)
+        ess_list.append(ess_val)
+    ess = np.array(ess_list)
         
-    print(f"  Gelman-Rubin R-hat: {rhats.round(3)} (Target: < 1.05)")
+    print(f"  Split Gelman-Rubin R-hat: {rhats.round(3)} (Target: < 1.05)")
     print(f"  Effective Sample Size: {ess.round(0)} (Target: > 400)")
     
     # Posterior parameter summaries

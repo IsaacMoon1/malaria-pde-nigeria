@@ -196,17 +196,27 @@ def run_all_verification():
     axes[0].grid(True, which="both", linestyle="--", alpha=0.5)
     axes[0].legend(loc="upper left")
     
-    # Plot B: Positivity and Mass Balance Timeline
-    t_mock = np.linspace(0, 180, 100)
-    y_total_mock = np.ones(100) * 1000.0
-    axes[1].plot(t_mock, y_total_mock, color='green', linewidth=2, label="Total Host Population N_H(t)")
-    axes[1].axhline(1000.0, linestyle=":", color="black", alpha=0.7)
-    axes[1].set_title("(b) Conservation of Mass & Strict State Positivity Invariance", fontweight="bold")
-    axes[1].set_xlabel("Simulation Days")
-    axes[1].set_ylabel("Integrated System Mass")
-    axes[1].set_ylim(995, 1005)
-    axes[1].grid(True, linestyle="--", alpha=0.5)
-    axes[1].legend(loc="lower right")
+    # Plot B: Real Human Mass Conservation Relative Discrepancy
+    climate_df = get_or_download_climate("Jigawa")
+    mol_b = MalariaPDESolver(L=5.0, Nx=25)
+    orig_mu = mol_b.p["mu_H"]
+    mol_b.p["mu_H"] = 0.0
+    sol_b = mol_b.simulate((0.0, 180.0), climate_df, interventions=None)
+    mol_b.p["mu_H"] = orig_mu
+    
+    Nx_b = 25
+    N_H_series = np.sum(sol_b.y[4*Nx_b : 9*Nx_b, :], axis=0) # total human mass across all nodes
+    rel_error = np.abs(N_H_series - N_H_series[0]) / max(1.0, N_H_series[0])
+    rel_error = np.maximum(rel_error, 1e-16) # floor for log axis
+    
+    axes[1].semilogy(sol_b.t, rel_error, color='#2ca02c', linewidth=2, label="Relative Mass Error |N(t)-N(0)|/N(0)")
+    axes[1].axhline(1e-14, linestyle=":", color="red", label="Machine Precision (~1e-14)")
+    axes[1].set_title("(b) Human Population Mass Invariance (Closed System)", fontweight="bold")
+    axes[1].set_xlabel("Simulation Time (Days)")
+    axes[1].set_ylabel("Relative Discrepancy (Log Scale)")
+    axes[1].set_ylim(1e-17, 1e-12)
+    axes[1].grid(True, which="both", linestyle="--", alpha=0.5)
+    axes[1].legend(loc="upper right")
     
     plt.tight_layout()
     fig_path = os.path.join(FIGURES_DIR, "fig2_verification_convergence.png")

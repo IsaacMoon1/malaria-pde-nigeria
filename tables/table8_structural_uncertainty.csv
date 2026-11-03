@@ -1,19 +1,19 @@
 Zone,Carrying_Capacity_Form,Intervention_Timing,Cases_Averted
-Zone 1 (Sahel),standard,July 15,4082.7
-Zone 1 (Sahel),standard,August 15,4711.5
-Zone 1 (Sahel),exponential,July 15,4082.7
-Zone 1 (Sahel),exponential,August 15,4711.5
-Zone 1 (Sahel),linear_capped,July 15,4082.7
-Zone 1 (Sahel),linear_capped,August 15,4711.5
-Zone 2 (Guinea Savanna),standard,July 15,1439.4
-Zone 2 (Guinea Savanna),standard,August 15,1961.5
-Zone 2 (Guinea Savanna),exponential,July 15,1439.4
-Zone 2 (Guinea Savanna),exponential,August 15,1961.5
-Zone 2 (Guinea Savanna),linear_capped,July 15,1439.4
-Zone 2 (Guinea Savanna),linear_capped,August 15,1961.5
-Zone 3 (Humid Forest),standard,July 15,900.9
-Zone 3 (Humid Forest),standard,August 15,1152.9
-Zone 3 (Humid Forest),exponential,July 15,900.9
-Zone 3 (Humid Forest),exponential,August 15,1152.9
-Zone 3 (Humid Forest),linear_capped,July 15,900.9
-Zone 3 (Humid Forest),linear_capped,August 15,1152.9
+Zone 1 (Sahel),standard,July 15,61254.2
+Zone 1 (Sahel),standard,August 15,72712.6
+Zone 1 (Sahel),exponential,July 15,61261.3
+Zone 1 (Sahel),exponential,August 15,72729.8
+Zone 1 (Sahel),linear_capped,July 15,61268.7
+Zone 1 (Sahel),linear_capped,August 15,72747.8
+Zone 2 (Guinea Savanna),standard,July 15,45870.5
+Zone 2 (Guinea Savanna),standard,August 15,50557.7
+Zone 2 (Guinea Savanna),exponential,July 15,45848.1
+Zone 2 (Guinea Savanna),exponential,August 15,50589.5
+Zone 2 (Guinea Savanna),linear_capped,July 15,45825.0
+Zone 2 (Guinea Savanna),linear_capped,August 15,50625.5
+Zone 3 (Humid Forest),standard,July 15,45570.7
+Zone 3 (Humid Forest),standard,August 15,50076.4
+Zone 3 (Humid Forest),exponential,July 15,45600.0
+Zone 3 (Humid Forest),exponential,August 15,50181.2
+Zone 3 (Humid Forest),linear_capped,July 15,45618.1
+Zone 3 (Humid Forest),linear_capped,August 15,50314.2

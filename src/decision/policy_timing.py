@@ -63,55 +63,71 @@ def run_decision_and_structural_analysis():
         # Use representative evaluation year (e.g., 2021)
         clim_eval = clim[(clim["date"] >= "2021-01-01") & (clim["date"] <= "2021-12-31")].reset_index(drop=True)
         
-        # Apply calibrated parameters
-        sub_cal = df_calib[df_calib["Zone"] == zone_label]
-        for _, r in sub_cal.iterrows():
-            solver.p[r["Parameter"]] = r["Posterior_Mean"]
+        # Propagate posterior uncertainty: load posterior samples
+        post_file = os.path.join(TABLES_DIR, f"posterior_samples_{rep_site.lower()}.csv")
+        if os.path.exists(post_file):
+            df_post = pd.read_csv(post_file)
+            sample_indices = np.linspace(0, len(df_post) - 1, min(25, len(df_post))).astype(int)
+            post_draws = df_post.iloc[sample_indices].to_dict('records')
+        else:
+            sub_cal = df_calib[df_calib["Zone"] == zone_label]
+            p_mean = {r["Parameter"]: r["Posterior_Mean"] for _, r in sub_cal.iterrows()}
+            post_draws = [p_mean]
             
-        # Counterfactual without intervention
-        sol_base = solver.simulate_fast((0.0, 365.0), clim_eval, interventions=None, dt=0.5)
-        cases_base = np.sum(sol_base.y[6*solver.Nx : 7*solver.Nx, :])
+        t_keys = list(CANDIDATE_TIMINGS.keys())
+        averted_ensemble = np.zeros((len(post_draws), len(t_keys)))
         
-        timing_averted = {}
-        
-        for t_label, t_start in CANDIDATE_TIMINGS.items():
-            interventions = {
-                "SMC_cycles": [t_start, t_start + 28.0, t_start + 56.0, t_start + 84.0],
-                "SMC_coverage": 0.80
-            }
-            sol_int = solver.simulate_fast((0.0, 365.0), clim_eval, interventions=interventions, dt=0.5)
-            cases_int = np.sum(sol_int.y[6*solver.Nx : 7*solver.Nx, :])
-            averted = max(0.0, cases_base - cases_int)
-            timing_averted[t_label] = averted
+        for s_idx, theta_draw in enumerate(post_draws):
+            solver.p.update(theta_draw)
+            sol_b = solver.simulate_fast((0.0, 365.0), clim_eval, interventions=None, dt=1.0)
+            gamma_val = solver.p.get("gamma_H", 0.0167)
+            # Clinical episodes = integral of gamma_H * I_H(x, t) dx dt
+            cases_b = np.sum(sol_b.y[6*solver.Nx : 7*solver.Nx, :]) * gamma_val * solver.dx * 1.0
             
-        timing_curves[zone_label] = timing_averted
+            for k_idx, (t_label, t_start) in enumerate(CANDIDATE_TIMINGS.items()):
+                interventions = {
+                    "SMC_cycles": [t_start, t_start + 28.0, t_start + 56.0, t_start + 84.0],
+                    "SMC_coverage": 0.80
+                }
+                sol_i = solver.simulate_fast((0.0, 365.0), clim_eval, interventions=interventions, dt=1.0)
+                cases_i = np.sum(sol_i.y[6*solver.Nx : 7*solver.Nx, :]) * gamma_val * solver.dx * 1.0
+                averted_ensemble[s_idx, k_idx] = max(0.0, cases_b - cases_i)
+                
+        # Posterior probability that each window is optimal: argmax per posterior sample
+        opt_indices_per_sample = np.argmax(averted_ensemble, axis=1)
+        prob_optimal = np.array([np.mean(opt_indices_per_sample == k) for k in range(len(t_keys))])
         
-        # Identify optimal timing
-        max_averted = max(timing_averted.values())
-        optimal_label = [k for k, v in timing_averted.items() if v == max_averted][0]
+        # Expected cases averted across posterior ensemble
+        mean_averted = np.mean(averted_ensemble, axis=0)
         
-        # Benchmark empirical practice averted
-        empirical_key = "July 15 (DOY 196) [Empirical North]" if "Zone 1" in zone_label else "August 15 (DOY 227) [Empirical Middle]"
-        empirical_averted = timing_averted[empirical_key]
+        # Expected Regret / Loss = mean over posterior draws of (max_averted_draw - chosen_averted_draw)
+        max_per_sample = np.max(averted_ensemble, axis=1, keepdims=True)
+        regret_ensemble = max_per_sample - averted_ensemble
+        expected_regret = np.mean(regret_ensemble, axis=0)
         
-        for t_label, av in timing_averted.items():
-            # Expected Regret / Loss = Optimal - Chosen
-            regret = max_averted - av
-            prob_opt = 1.0 if t_label == optimal_label else 0.0
-            
+        # Empirical practice comparison index
+        emp_idx = 2 if "Zone 1" in zone_label else 3
+        loss_vs_empirical = np.mean(averted_ensemble[:, emp_idx:emp_idx+1] - averted_ensemble, axis=0)
+        
+        timing_curves[zone_label] = {t_keys[k]: mean_averted[k] for k in range(len(t_keys))}
+        best_k = np.argmax(prob_optimal)
+        
+        for k, t_label in enumerate(t_keys):
             decision_records.append({
                 "Zone": zone_label,
                 "Representative_Site": rep_site,
                 "Timing_Window": t_label,
-                "Cases_Averted_Index": round(av, 1),
-                "Prob_Optimal": prob_opt,
-                "Expected_Loss_Regret": round(regret, 1),
-                "Loss_vs_Empirical_Practice": round(empirical_averted - av, 1),
-                "Is_Optimal": (t_label == optimal_label)
+                "Cases_Averted_Index": round(mean_averted[k], 1),
+                "Prob_Optimal": round(prob_optimal[k], 3),
+                "Expected_Loss_Regret": round(expected_regret[k], 1),
+                "Loss_vs_Empirical_Practice": round(loss_vs_empirical[k], 1),
+                "Is_Optimal": (k == best_k)
             })
             
         # Structural Uncertainty Check
         for s_form in STRUCTURAL_FORMS:
+            sol_base_struct = solver.simulate_fast((0.0, 365.0), clim_eval, interventions=None, carrying_capacity_form=s_form, dt=0.5)
+            cases_base_struct = np.sum(sol_base_struct.y[6*solver.Nx : 7*solver.Nx, :])
             for t_label, t_start in [("July 15", 196.0), ("August 15", 227.0)]:
                 interventions = {
                     "SMC_cycles": [t_start, t_start + 28.0, t_start + 56.0, t_start + 84.0],
@@ -119,7 +135,7 @@ def run_decision_and_structural_analysis():
                 }
                 sol_struct = solver.simulate_fast((0.0, 365.0), clim_eval, interventions=interventions, carrying_capacity_form=s_form, dt=0.5)
                 cases_struct = np.sum(sol_struct.y[6*solver.Nx : 7*solver.Nx, :])
-                av_struct = max(0.0, cases_base - cases_struct)
+                av_struct = max(0.0, cases_base_struct - cases_struct)
                 
                 structural_records.append({
                     "Zone": zone_label,

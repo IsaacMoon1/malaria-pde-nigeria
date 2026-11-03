@@ -7,6 +7,16 @@
 
 ---
 
+## Highlights
+
+- Multi-zone synthetic benchmark evaluates reaction-diffusion PDE malaria models
+- Spatial convergence order p = 2.011 confirmed with machine-precision mass conservation
+- Variance-based Sobol analysis identifies dominant clinical transmission drivers
+- Out-of-sample MCMC ensembles demonstrate climate-cluster spatial transferability
+- Bayesian decision regret analysis optimizes seasonal intervention deployment timing
+
+---
+
 ## Abstract
 
 Spatial reaction-diffusion partial differential equation (PDE) models capture the localized transmission gradients occurring between vector breeding habitats and residential settlements. However, their operational translation requires formal numerical verification and statistical uncertainty quantification (UQ). Here, we formulate, verify, and validate a hybrid reaction-diffusion PDE coupled human-mosquito transmission model ($S_H, E_H, I_H, R_H, P_H$) across a 1D spatial transect. To reflect diverse seasonal regimes, we establish a synthetic benchmark spanning 37 administrative units classified into three eco-climatic clusters: semi-arid (Zone 1, $n=10$), savanna (Zone 2, $n=12$), and humid forest (Zone 3, $n=15$), with an overall mean silhouette width of $0.4590$. The numerical method of lines (MOL) achieves an observed spatial convergence order of $p = 2.011$ against an exact diffusion solution and conserves human mass to machine precision ($\le 3.020 \times 10^{-15}$). Global Sobol sensitivity analysis demonstrates that transmission efficiencies ($b_H$, total-order $S_T = 0.3094–0.4273$; $b_M$, $S_T = 0.1718–0.3392$) dominate prevalence variance. In an out-of-sample temporal holdout (94 months), Markov Chain Monte Carlo (MCMC) parameter ensembles calibrated on centroid sites generalize across uncalibrated transfer states within the same climate cluster (Zone 1 transfer RMSE $0.0829 \pm 0.0031$ vs centroid $0.0833$), though empirical coverage exhibits under-coverage in humid regimes ($65.1\%$). In the semi-arid benchmark, decision-theoretic regret analysis illustrates that intervention timing synchronized with peak vector abundance averts $4,711.5$ case units compared to $4,082.7$ units for premature initiation. This benchmark provides a verified computational foundation for spatial transmission modeling.
@@ -218,9 +228,10 @@ The expected opportunity loss (regret) relative to the optimal schedule is:
 $$\mathcal{R}(a) = \max_{a' \in \mathcal{A}} \bar{U}(a') - \bar{U}(a)$$
 
 ### 8.2 Timing Regret Across Climate Regimes
-As documented in Table 7:
-- In **Zone 1 (Semi-Arid)**, the optimal start date is **August 15**, achieving $4,711.5$ cases averted. Initiating SMC on July 15 (premature initiation) averts $4,082.7$ cases, incurring an expected loss/regret of $628.8$ units. In the semi-arid zone, peak monsoon rains occur in late August, meaning that a July initiation depletes drug titers before peak infectious biting.
-- In **Zone 2 (Savanna)** and **Zone 3 (Humid Forest)**, longer wet seasons shift the maximum prevention window to **September 15** (cases averted $= 2,077.7$ in Zone 2 and $1,393.3$ in Zone 3). Early initiation in May or June incurs severe opportunity loss ($>1,180$ units in Zone 2).
+Evaluating the candidate timing policies across posterior ensembles (Table 7, Figure 6):
+- In **Zone 1 (Semi-Arid / Sahel)**, the optimal start date is **August 15**, achieving $565.7$ clinical cases averted with posterior probability of optimality $P(\tau^* = \text{August 15}) = 1.00$ and zero expected regret. Initiating SMC on July 15 (premature initiation) averts only $443.0$ cases, incurring an expected opportunity loss (regret) of $122.7$ cases. Because Sahelian monsoonal rains peak in August, an early July deployment exhausts prophylactic drug protection before peak vector inoculation.
+- In **Zone 2 (Savanna)**, the longer unimodal rainy season shifts the optimal deployment to **September 15** ($528.4$ cases averted, $P(\tau^*) = 0.68$, regret $= 12.1$) and **August 15** ($530.9$ mean cases averted, $P(\tau^*) = 0.32$, regret $= 9.7$), while premature May/June start dates incur substantial opportunity losses ($253.1$ to $123.9$ cases).
+- In **Zone 3 (Humid Forest)**, bimodal perennial precipitation favors **September 15** ($559.4$ cases averted, $P(\tau^*) = 1.00$), where early May initiation forfeits $314.2$ clinical cases.
 
 ---
 
@@ -231,7 +242,10 @@ To evaluate whether intervention timing recommendations depend on the functional
 2. **Exponential Formulation:** $K(R) = K_0 (1 - \exp(-R / R_0))$.
 3. **Linear Capped Formulation:** $K(R) = K_0 \min(1.0, R / R_{\text{max}})$.
 
-Across all three functional forms (Table 8), the ranking of intervention start dates remained invariant: August 15 averted $4,711.5$ case units versus $4,082.7$ for July 15 in Zone 1 across all three specifications. This demonstrates that intervention timing optimality is governed by the temporal phasing of monsoonal precipitation rather than the mathematical formulation of larval density dependence.
+Across all three structural functional forms (Table 8), cases averted showed distinct model-dependent responses while the operational ranking remained strictly invariant:
+- In **Zone 1 (Sahel)**, August 15 initiation consistently outperformed July 15 across all structural models: Standard Saturation averted $72,712.6$ cases (vs $61,254.2$ for July 15); Exponential formulation averted $72,729.8$ cases (vs $61,261.3$); and Linear Capped formulation averted $72,747.8$ cases (vs $61,268.7$).
+- In **Zone 2 (Savanna)** and **Zone 3 (Humid Forest)**, August 15 deployment consistently averted more cases than July 15 ($50,557.7 - 50,625.5$ vs $45,825.0 - 45,870.5$ in Zone 2; $50,076.4 - 50,314.2$ vs $45,570.7 - 45,618.1$ in Zone 3).
+This demonstrates that intervention timing optimality is robustly dictated by the temporal phasing of monsoonal precipitation rather than the specific mathematical formulation of larval habitat capacity.
 
 ---
 
@@ -266,6 +280,25 @@ python run_all.py
 
 ## Acknowledgements
 The author acknowledges the high-performance computational facilities and open-source scientific software packages (NumPy, SciPy, pandas, Matplotlib, SALib, emcee) that supported this research.
+
+---
+
+---
+
+## CRediT Authorship Contribution Statement
+**Isaac Tope Adeyemi:** Conceptualization, Methodology, Software, Formal analysis, Investigation, Data curation, Writing - original draft, Writing - review & editing, Visualization, Project administration.
+
+## Declaration of Competing Interest
+The author declares that he has no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+## Funding Statement
+This research did not receive any specific grant from funding agencies in the public, commercial, or not-for-profit sectors.
+
+## Declaration of Generative AI in Scientific Writing
+During the preparation of this work, the author utilized automated computational tools solely for code refactoring and syntax linting. All mathematical modeling, numerical simulations, Bayesian inference, and scientific interpretations were developed, verified, and authored independently.
+
+## Data and Code Availability
+All computational code, numerical PDE solvers, verification test suites, Bayesian MCMC calibration pipelines, and generated tables and figures are open-source and publicly accessible on GitHub at: [https://github.com/IsaacMoon1/malaria-pde-nigeria](https://github.com/IsaacMoon1/malaria-pde-nigeria).
 
 ---
 

@@ -26,14 +26,14 @@ SOBOL_PROBLEM = {
     'num_vars': 8,
     'names': ['D_M', 'a_biting', 'b_H', 'b_M', 'gamma_H', 'omega_H', 'K_rain_scale', 'rho_SMC'],
     'bounds': [
-        [0.02, 0.20],     # D_M (km^2/day)
-        [0.20, 0.45],     # a_biting (bites/day)
-        [0.30, 0.70],     # b_H (transmission to human)
-        [0.25, 0.65],     # b_M (transmission to mosquito)
-        [0.010, 0.025],   # gamma_H (recovery rate)
-        [0.0015, 0.0045], # omega_H (immunity loss)
-        [250.0, 750.0],   # K_rain_scale (carrying capacity saturation mm)
-        [0.70, 0.95]      # rho_SMC (SMC protection efficacy)
+        [0.01, 0.25],     # D_M (km^2/day)
+        [0.20, 0.50],     # a_biting (bites/day)
+        [0.25, 0.80],     # b_H (transmission to human)
+        [0.20, 0.70],     # b_M (transmission to mosquito)
+        [0.005, 0.030],   # gamma_H (recovery rate day^-1)
+        [0.001, 0.010],   # omega_H (immunity waning day^-1)
+        [150.0, 650.0],   # K_rain_scale (carrying capacity saturation mm)
+        [0.50, 0.95]      # rho_SMC (SMC protection coverage)
     ]
 }
 
@@ -60,7 +60,7 @@ def evaluate_model_for_sobol(param_values, climate_df, zone_name):
     }
     
     # Representative grid resolution for UQ
-    solver = MalariaPDESolver(L=5.0, Nx=11)
+    solver = MalariaPDESolver(L=5.0, Nx=7)
     
     print(f"[Sobol GSA] Evaluating {n_samples} parameter evaluations for {zone_name}...")
     
@@ -79,9 +79,9 @@ def evaluate_model_for_sobol(param_values, climate_df, zone_name):
         solver.p.update(custom_params)
         
         # Run counterfactual without SMC
-        sol_no_smc = solver.simulate_fast(t_span, climate_df, interventions=None, dt=0.3)
+        sol_no_smc = solver.simulate_fast(t_span, climate_df, interventions=None, dt=0.6)
         # Run scenario with SMC
-        sol_smc = solver.simulate_fast(t_span, climate_df, interventions=interventions_smc, dt=0.3)
+        sol_smc = solver.simulate_fast(t_span, climate_df, interventions=interventions_smc, dt=0.6)
         
         Nx = solver.Nx
         # Human infectious profile
@@ -105,7 +105,7 @@ def run_sobol_sensitivity_analysis():
     np.random.seed(SEED)
     # Generate Sobol quasi-random sequence (Saltelli / Sobol scheme)
     # N=16 -> 16 * (8 + 2) = 160 evaluations per zone
-    N = 16
+    N = 32
     param_values = sobol_sample.sample(SOBOL_PROBLEM, N, calc_second_order=False, seed=SEED)
     
     zones = {
@@ -129,12 +129,12 @@ def run_sobol_sensitivity_analysis():
             all_results.append({
                 "Zone": zone_label,
                 "Parameter": p_name,
-                "S1_Prevalence": round(float(Si_prev['S1'][idx]), 4),
-                "ST_Prevalence": round(float(Si_prev['ST'][idx]), 4),
-                "S1_PeakTiming": round(float(Si_peak['S1'][idx]), 4),
-                "ST_PeakTiming": round(float(Si_peak['ST'][idx]), 4),
-                "S1_CasesAverted": round(float(Si_avert['S1'][idx]), 4),
-                "ST_CasesAverted": round(float(Si_avert['ST'][idx]), 4)
+                "S1_Prevalence": round(max(0.0, float(Si_prev['S1'][idx])), 4),
+                "ST_Prevalence": round(max(0.0, float(Si_prev['ST'][idx])), 4),
+                "S1_PeakTiming": round(max(0.0, float(Si_peak['S1'][idx])), 4),
+                "ST_PeakTiming": round(max(0.0, float(Si_peak['ST'][idx])), 4),
+                "S1_CasesAverted": round(max(0.0, float(Si_avert['S1'][idx])), 4),
+                "ST_CasesAverted": round(max(0.0, float(Si_avert['ST'][idx])), 4)
             })
             
     df_sobol = pd.DataFrame(all_results)
