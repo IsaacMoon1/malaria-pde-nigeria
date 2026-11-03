@@ -1,0 +1,16 @@
+Zone,Representative_Site,Timing_Window,Cases_Averted_Index,Prob_Optimal,Expected_Loss_Regret,Loss_vs_Empirical_Practice,Is_Optimal
+Zone 1 (Sahel),Jigawa,May 15 (DOY 135),3492.7,0.0,1218.8,590.0,False
+Zone 1 (Sahel),Jigawa,June 15 (DOY 166),3964.2,0.0,747.3,118.5,False
+Zone 1 (Sahel),Jigawa,July 15 (DOY 196) [Empirical North],4082.7,0.0,628.8,0.0,False
+Zone 1 (Sahel),Jigawa,August 15 (DOY 227) [Empirical Middle],4711.5,1.0,0.0,-628.8,True
+Zone 1 (Sahel),Jigawa,September 15 (DOY 258),4025.1,0.0,686.4,57.6,False
+Zone 2 (Guinea Savanna),FCT,May 15 (DOY 135),893.9,0.0,1183.8,1067.6,False
+Zone 2 (Guinea Savanna),FCT,June 15 (DOY 166),878.1,0.0,1199.6,1083.4,False
+Zone 2 (Guinea Savanna),FCT,July 15 (DOY 196) [Empirical North],1439.4,0.0,638.3,522.1,False
+Zone 2 (Guinea Savanna),FCT,August 15 (DOY 227) [Empirical Middle],1961.5,0.0,116.2,0.0,False
+Zone 2 (Guinea Savanna),FCT,September 15 (DOY 258),2077.7,1.0,0.0,-116.2,True
+Zone 3 (Humid Forest),Abia,May 15 (DOY 135),583.2,0.0,810.2,569.7,False
+Zone 3 (Humid Forest),Abia,June 15 (DOY 166),559.9,0.0,833.5,593.0,False
+Zone 3 (Humid Forest),Abia,July 15 (DOY 196) [Empirical North],900.9,0.0,492.4,251.9,False
+Zone 3 (Humid Forest),Abia,August 15 (DOY 227) [Empirical Middle],1152.9,0.0,240.5,0.0,False
+Zone 3 (Humid Forest),Abia,September 15 (DOY 258),1393.3,1.0,0.0,-240.5,True

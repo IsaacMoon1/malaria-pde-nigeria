@@ -1,0 +1,38 @@
+State,Climate_Zone,Is_Representative_Site,Holdout_Months,RMSE,CRPS,Coverage_95_CI,Transfer_Status
+Abia,Zone 3 (Humid Forest),True,94,0.0865,0.0547,0.596,Calibrated Site
+Adamawa,Zone 2 (Guinea Savanna),False,94,0.0798,0.0469,0.798,Spatial Transfer Generalization
+Akwa Ibom,Zone 3 (Humid Forest),False,94,0.101,0.0647,0.532,Spatial Transfer Generalization
+Anambra,Zone 3 (Humid Forest),False,94,0.083,0.0489,0.734,Spatial Transfer Generalization
+Bauchi,Zone 1 (Sahel),False,94,0.0779,0.0444,0.862,Spatial Transfer Generalization
+Bayelsa,Zone 3 (Humid Forest),False,94,0.1039,0.0683,0.5,Spatial Transfer Generalization
+Benue,Zone 2 (Guinea Savanna),False,94,0.0692,0.0356,0.936,Spatial Transfer Generalization
+Borno,Zone 1 (Sahel),False,94,0.085,0.0529,0.766,Spatial Transfer Generalization
+Cross River,Zone 3 (Humid Forest),False,94,0.098,0.0627,0.585,Spatial Transfer Generalization
+Delta,Zone 3 (Humid Forest),False,94,0.0923,0.0574,0.596,Spatial Transfer Generalization
+Ebonyi,Zone 3 (Humid Forest),False,94,0.0796,0.0454,0.723,Spatial Transfer Generalization
+Edo,Zone 3 (Humid Forest),False,94,0.0861,0.0525,0.628,Spatial Transfer Generalization
+Ekiti,Zone 3 (Humid Forest),False,94,0.0776,0.0451,0.723,Spatial Transfer Generalization
+Enugu,Zone 3 (Humid Forest),False,94,0.0771,0.0432,0.713,Spatial Transfer Generalization
+FCT,Zone 2 (Guinea Savanna),True,94,0.071,0.0378,0.862,Calibrated Site
+Gombe,Zone 1 (Sahel),False,94,0.0816,0.0484,0.819,Spatial Transfer Generalization
+Imo,Zone 3 (Humid Forest),False,94,0.0885,0.0542,0.606,Spatial Transfer Generalization
+Jigawa,Zone 1 (Sahel),True,94,0.0833,0.0514,0.798,Calibrated Site
+Kaduna,Zone 2 (Guinea Savanna),False,94,0.0722,0.0391,0.777,Spatial Transfer Generalization
+Kano,Zone 1 (Sahel),False,94,0.0828,0.0506,0.787,Spatial Transfer Generalization
+Katsina,Zone 1 (Sahel),False,94,0.0854,0.0534,0.766,Spatial Transfer Generalization
+Kebbi,Zone 1 (Sahel),False,94,0.0793,0.0463,0.894,Spatial Transfer Generalization
+Kogi,Zone 2 (Guinea Savanna),False,94,0.0701,0.0373,0.883,Spatial Transfer Generalization
+Kwara,Zone 2 (Guinea Savanna),False,94,0.0732,0.0393,0.862,Spatial Transfer Generalization
+Lagos,Zone 3 (Humid Forest),False,94,0.0775,0.0445,0.755,Spatial Transfer Generalization
+Nasarawa,Zone 2 (Guinea Savanna),False,94,0.0706,0.037,0.851,Spatial Transfer Generalization
+Niger,Zone 2 (Guinea Savanna),False,94,0.0727,0.0395,0.851,Spatial Transfer Generalization
+Ogun,Zone 2 (Guinea Savanna),False,94,0.075,0.0418,0.777,Spatial Transfer Generalization
+Ondo,Zone 3 (Humid Forest),False,94,0.0797,0.0472,0.702,Spatial Transfer Generalization
+Osun,Zone 2 (Guinea Savanna),False,94,0.073,0.0408,0.84,Spatial Transfer Generalization
+Oyo,Zone 2 (Guinea Savanna),False,94,0.0718,0.0394,0.819,Spatial Transfer Generalization
+Plateau,Zone 3 (Humid Forest),False,94,0.0804,0.0441,0.734,Spatial Transfer Generalization
+Rivers,Zone 3 (Humid Forest),False,94,0.0926,0.0584,0.585,Spatial Transfer Generalization
+Sokoto,Zone 1 (Sahel),False,94,0.0832,0.0505,0.798,Spatial Transfer Generalization
+Taraba,Zone 2 (Guinea Savanna),False,94,0.0713,0.0377,0.883,Spatial Transfer Generalization
+Yobe,Zone 1 (Sahel),False,94,0.0878,0.0558,0.734,Spatial Transfer Generalization
+Zamfara,Zone 1 (Sahel),False,94,0.0827,0.0499,0.745,Spatial Transfer Generalization

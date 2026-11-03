@@ -1,0 +1,25 @@
+Zone,Parameter,S1_Prevalence,ST_Prevalence,S1_PeakTiming,ST_PeakTiming,S1_CasesAverted,ST_CasesAverted
+Zone 1 (Sahel),D_M,-0.0617,0.0039,0.0,0.0,0.0,0.0
+Zone 1 (Sahel),a_biting,0.0,0.0,0.0,0.0,0.0,0.0
+Zone 1 (Sahel),b_H,0.2163,0.4273,0.0,0.0,0.0,0.0
+Zone 1 (Sahel),b_M,0.1991,0.2478,0.0,0.0,0.0,0.0
+Zone 1 (Sahel),gamma_H,0.0073,0.0496,0.0,0.0,0.0,0.0
+Zone 1 (Sahel),omega_H,-0.0164,0.1478,0.0,0.0,0.0,0.0
+Zone 1 (Sahel),K_rain_scale,0.0,0.0,0.0,0.0,0.0,0.0
+Zone 1 (Sahel),rho_SMC,-0.0,0.0,0.0,0.0,0.0,0.0
+Zone 2 (Guinea Savanna),D_M,-0.141,0.1131,0.0,0.0,0.0,0.0
+Zone 2 (Guinea Savanna),a_biting,0.0,0.0,0.0,0.0,0.0,0.0
+Zone 2 (Guinea Savanna),b_H,-0.0691,0.3557,0.0,0.0,0.0,0.0
+Zone 2 (Guinea Savanna),b_M,0.2334,0.3392,0.0,0.0,0.0,0.0
+Zone 2 (Guinea Savanna),gamma_H,-0.2508,0.0816,0.0,0.0,0.0,0.0
+Zone 2 (Guinea Savanna),omega_H,-0.025,0.0646,0.0,0.0,0.0,0.0
+Zone 2 (Guinea Savanna),K_rain_scale,0.0,0.0,0.0,0.0,0.0,0.0
+Zone 2 (Guinea Savanna),rho_SMC,-0.0,0.0,0.0,0.0,0.0,0.0
+Zone 3 (Humid Forest),D_M,-0.0993,0.0156,0.0,0.0,0.0,0.0
+Zone 3 (Humid Forest),a_biting,0.0,0.0,0.0,0.0,0.0,0.0
+Zone 3 (Humid Forest),b_H,0.2442,0.3094,0.0,0.0,0.0,0.0
+Zone 3 (Humid Forest),b_M,0.1262,0.1718,0.0,0.0,0.0,0.0
+Zone 3 (Humid Forest),gamma_H,0.0438,0.0481,0.0,0.0,0.0,0.0
+Zone 3 (Humid Forest),omega_H,-0.0099,0.0976,0.0,0.0,0.0,0.0
+Zone 3 (Humid Forest),K_rain_scale,0.0,0.0,0.0,0.0,0.0,0.0
+Zone 3 (Humid Forest),rho_SMC,-0.0,0.0,0.0,0.0,0.0,0.0
