@@ -1,19 +1,46 @@
 Zone,Carrying_Capacity_Form,Intervention_Timing,Cases_Averted
+Zone 1 (Sahel),standard,May 15,46435.2
+Zone 1 (Sahel),standard,June 15,54525.2
 Zone 1 (Sahel),standard,July 15,61254.2
 Zone 1 (Sahel),standard,August 15,72712.6
+Zone 1 (Sahel),standard,September 15,69737.2
+Zone 1 (Sahel),exponential,May 15,46425.6
+Zone 1 (Sahel),exponential,June 15,54530.9
 Zone 1 (Sahel),exponential,July 15,61261.3
 Zone 1 (Sahel),exponential,August 15,72729.8
+Zone 1 (Sahel),exponential,September 15,69745.4
+Zone 1 (Sahel),linear_capped,May 15,46400.2
+Zone 1 (Sahel),linear_capped,June 15,54537.1
 Zone 1 (Sahel),linear_capped,July 15,61268.7
 Zone 1 (Sahel),linear_capped,August 15,72747.8
+Zone 1 (Sahel),linear_capped,September 15,69754.1
+Zone 2 (Guinea Savanna),standard,May 15,30313.3
+Zone 2 (Guinea Savanna),standard,June 15,41266.0
 Zone 2 (Guinea Savanna),standard,July 15,45870.5
 Zone 2 (Guinea Savanna),standard,August 15,50557.7
+Zone 2 (Guinea Savanna),standard,September 15,49376.4
+Zone 2 (Guinea Savanna),exponential,May 15,30286.9
+Zone 2 (Guinea Savanna),exponential,June 15,41248.1
 Zone 2 (Guinea Savanna),exponential,July 15,45848.1
 Zone 2 (Guinea Savanna),exponential,August 15,50589.5
+Zone 2 (Guinea Savanna),exponential,September 15,49368.7
+Zone 2 (Guinea Savanna),linear_capped,May 15,30260.8
+Zone 2 (Guinea Savanna),linear_capped,June 15,41226.2
 Zone 2 (Guinea Savanna),linear_capped,July 15,45825.0
 Zone 2 (Guinea Savanna),linear_capped,August 15,50625.5
+Zone 2 (Guinea Savanna),linear_capped,September 15,49360.6
+Zone 3 (Humid Forest),standard,May 15,30461.2
+Zone 3 (Humid Forest),standard,June 15,38513.5
 Zone 3 (Humid Forest),standard,July 15,45570.7
 Zone 3 (Humid Forest),standard,August 15,50076.4
+Zone 3 (Humid Forest),standard,September 15,47727.4
+Zone 3 (Humid Forest),exponential,May 15,30377.2
+Zone 3 (Humid Forest),exponential,June 15,38452.4
 Zone 3 (Humid Forest),exponential,July 15,45600.0
 Zone 3 (Humid Forest),exponential,August 15,50181.2
+Zone 3 (Humid Forest),exponential,September 15,47826.0
+Zone 3 (Humid Forest),linear_capped,May 15,30267.2
+Zone 3 (Humid Forest),linear_capped,June 15,38375.6
 Zone 3 (Humid Forest),linear_capped,July 15,45618.1
 Zone 3 (Humid Forest),linear_capped,August 15,50314.2
+Zone 3 (Humid Forest),linear_capped,September 15,47938.0

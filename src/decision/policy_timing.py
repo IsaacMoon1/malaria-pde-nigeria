@@ -124,11 +124,12 @@ def run_decision_and_structural_analysis():
                 "Is_Optimal": (k == best_k)
             })
             
-        # Structural Uncertainty Check
+        # Structural Uncertainty Check across all 5 candidate start dates
         for s_form in STRUCTURAL_FORMS:
             sol_base_struct = solver.simulate_fast((0.0, 365.0), clim_eval, interventions=None, carrying_capacity_form=s_form, dt=0.5)
             cases_base_struct = np.sum(sol_base_struct.y[6*solver.Nx : 7*solver.Nx, :])
-            for t_label, t_start in [("July 15", 196.0), ("August 15", 227.0)]:
+            for t_label_full, t_start in CANDIDATE_TIMINGS.items():
+                t_short = t_label_full.split(' (')[0]
                 interventions = {
                     "SMC_cycles": [t_start, t_start + 28.0, t_start + 56.0, t_start + 84.0],
                     "SMC_coverage": 0.80
@@ -140,7 +141,7 @@ def run_decision_and_structural_analysis():
                 structural_records.append({
                     "Zone": zone_label,
                     "Carrying_Capacity_Form": s_form,
-                    "Intervention_Timing": t_label,
+                    "Intervention_Timing": t_short,
                     "Cases_Averted": round(av_struct, 1)
                 })
                 
@@ -164,14 +165,17 @@ def run_decision_and_structural_analysis():
         
     tex_struct = os.path.join(TABLES_DIR, "table8_structural_uncertainty.tex")
     with open(tex_struct, "w") as f:
-        f.write("% Structural Uncertainty: Model Form Sensitivity\n")
-        f.write("\\begin{tabular}{llcc}\n\\hline\n")
-        f.write("Zone & Habitat Capacity Formulation & July 15 Averted & August 15 Averted \\\\\n\\hline\n")
+        f.write("% Structural Uncertainty: Model Form Sensitivity Across All Candidate Windows\n")
+        f.write("\\begin{tabular}{llccccc}\n\\hline\n")
+        f.write("Zone & Habitat Formulation & May 15 & June 15 & July 15 & August 15 & September 15 \\\\\n\\hline\n")
+        short_dates = ["May 15", "June 15", "July 15", "August 15", "September 15"]
         for z_name in zones.keys():
             for s_form in STRUCTURAL_FORMS:
-                july_val = df_struct[(df_struct["Zone"] == z_name) & (df_struct["Carrying_Capacity_Form"] == s_form) & (df_struct["Intervention_Timing"] == "July 15")]["Cases_Averted"].values[0]
-                aug_val = df_struct[(df_struct["Zone"] == z_name) & (df_struct["Carrying_Capacity_Form"] == s_form) & (df_struct["Intervention_Timing"] == "August 15")]["Cases_Averted"].values[0]
-                f.write(f"{z_name} & {s_form.capitalize()} & {july_val} & {aug_val} \\\\\n")
+                row_vals = []
+                for d_str in short_dates:
+                    v = df_struct[(df_struct["Zone"] == z_name) & (df_struct["Carrying_Capacity_Form"] == s_form) & (df_struct["Intervention_Timing"] == d_str)]["Cases_Averted"].values[0]
+                    row_vals.append(f"{v:.1f}")
+                f.write(f"{z_name} & {s_form.capitalize()} & {' & '.join(row_vals)} \\\\\n")
         f.write("\\hline\n\\end{tabular}\n")
         
     # Generate Publication Figure 6 (Timing Curve & Expected Loss Comparison)

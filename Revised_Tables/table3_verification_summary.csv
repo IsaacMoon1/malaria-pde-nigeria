@@ -1,0 +1,7 @@
+Test,Metric,Value,Criterion,Status
+1. Analytic MMS Diffusion Accuracy,L2 Error (Nx=129),5.055e-06,< 1e-4,PASSED
+2. Spatial Discretization Convergence,Asymptotic Order p,2.011,p ≈ 2.0 ± 0.1,PASSED
+3. Temporal Integration Stability,Adaptive Step Tolerance,"rtol=1e-4, atol=1e-6",Adaptive RK45,PASSED
+4. Independent Solver Cross-Check,Pearson r / NRMSE,"r=1.0000, NRMSE=0.01%","r > 0.99, NRMSE < 5%",PASSED
+5. Human Mass Conservation,Relative Population Invariance,< 1e-5,< 1e-4,PASSED
+6. Biological Positivity & Boundedness,Global Invariant Minimum,>= 0.0,y_i(t) >= 0,PASSED
